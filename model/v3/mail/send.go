@@ -4,17 +4,17 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/smtp"
-	"io"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"gopkg.in/go-playground/validator.v9"
 	"github.com/jordan-wright/email"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type PostRequest struct {
@@ -175,18 +175,16 @@ func sendMailWithSMTP(postRequest PostRequest)  (int, ErrorResponse) {
 			continue
 		}
 
-		if len(os.Getenv("SENDGRID_DEV_SMTP_USERNAME")) > 0 {
-			arr := strings.Split(os.Getenv("SENDGRID_DEV_SMTP_SERVER"), ":")
-			e.Send(
-				os.Getenv("SENDGRID_DEV_SMTP_SERVER"), 
-				smtp.PlainAuth(
-					"", 
-					os.Getenv("SENDGRID_DEV_SMTP_USERNAME"), 
-					os.Getenv("SENDGRID_DEV_SMTP_PASSWORD"), 
-					arr[0],
-				),
-			)
-		}
+		arr := strings.Split(os.Getenv("SENDGRID_DEV_SMTP_SERVER"), ":")
+		e.Send(
+			os.Getenv("SENDGRID_DEV_SMTP_SERVER"), 
+			smtp.PlainAuth(
+				"", 
+				os.Getenv("SENDGRID_DEV_SMTP_USERNAME"), 
+				os.Getenv("SENDGRID_DEV_SMTP_PASSWORD"), 
+				arr[0],
+			),
+		)
 
 		e.Send(os.Getenv("SENDGRID_DEV_SMTP_SERVER"), nil)
 	}

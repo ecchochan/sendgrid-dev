@@ -1,8 +1,10 @@
-# SendGrid Mock API
+# SendGrid Mock API + Inbucket
 
 SendGrid Dev is SengGrid mock API for test your sendgrid emails during development.
 
-[SengGrid MailDev](https://hub.docker.com/r/ykanazawa/sendgrid-maildev) is Docker container with SendGrid Mock API + [MailDev](https://maildev.github.io/maildev/).
+[SengGrid Inbucket](https://hub.docker.com/r/ecchochan/sendgrid-dev) is Docker container with SendGrid Mock API + [Inbucket](https://github.com/inbucket/inbucket).
+
+Forked from https://github.com/yKanazawa/sendgrid-dev
 
 ## Requirements
 
@@ -10,40 +12,37 @@ SendGrid Dev is SengGrid mock API for test your sendgrid emails during developme
 
 ## Debug
 
-### Sample with MailDev (Can work by default)
+### Sample with Inbucket (Can work by default)
 
-Run maildev
-```
-docker pull maildev/maildev
-docker run -p 1080:1080 -p 1025:1025 maildev/maildev
-```
+Run docker-compose
 
-Run SendGrid Mock API
 ```
-go run main.go
+docker-compose up -d
 ```
 
 Send mail by curl
+
 ```
 curl --request POST \
   --url http://localhost:3030/v3/mail/send \
   --header 'Authorization: Bearer SG.xxxxx' \
   --header 'Content-Type: application/json' \
-  --data '{"personalizations": [{ 
-    "to": [{"email": "to@example.com"}]}], 
-    "from": {"email": "from@example.com"}, 
-    "subject": "Test Subject", 
-    "content": [{"type": "text/plain", "value": "Test Content"}] 
+  --data '{"personalizations": [{
+    "to": [{"email": "to@example.com"}]}],
+    "from": {"email": "from@example.com"},
+    "subject": "Test Subject",
+    "content": [{"type": "text/plain", "value": "Test Content"}]
   }'
 ```
 
-Check with maildev
+Check with inbucket
 
-http://localhost:1080/
+http://localhost:9000/
 
 ### Sample with MailTrap (with SMTP Auth)
 
 Run SendGrid Mock API
+
 ```
 export SENDGRID_DEV_API_SERVER :3030
 export SENDGRID_DEV_API_KEY=SG.xxxxx
@@ -54,16 +53,17 @@ go run main.go
 ```
 
 Send mail by curl
+
 ```
 curl --request POST \
   --url http://localhost:3030/v3/mail/send \
   --header 'Authorization: Bearer SG.xxxxx' \
   --header 'Content-Type: application/json' \
-  --data '{"personalizations": [{ 
-    "to": [{"email": "to@example.com"}]}], 
-    "from": {"email": "from@example.com"}, 
-    "subject": "Test Subject", 
-    "content": [{"type": "text/plain", "value": "Test Content"}] 
+  --data '{"personalizations": [{
+    "to": [{"email": "to@example.com"}]}],
+    "from": {"email": "from@example.com"},
+    "subject": "Test Subject",
+    "content": [{"type": "text/plain", "value": "Test Content"}]
   }'
 ```
 
@@ -81,12 +81,24 @@ go test
 
 ### x86_64
 
-```
+```bash
 env GOOS=linux GOARCH=amd64 go build -o sendgrid-dev_x86_64 main.go
 ```
 
 ### arm64
 
-```
+```bash
 env GOOS=linux GOARCH=arm64 go build -o sendgrid-dev_aarch64 main.go
+```
+
+### Docker
+
+```bash
+docker buildx build \
+  --push \
+  -f Dockerfile \
+  -t ecchochan/sendgrid-dev:v0.9.1 \
+  --platform linux/arm64,linux/amd64 \
+  .
+
 ```

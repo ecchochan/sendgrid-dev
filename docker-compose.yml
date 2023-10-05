@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  sendgrid-dev:
+    image: ecchochan/sendgrid-dev:v0.9.1
+    restart: on-failure
+    ports:
+      - "3030:3030"
+    environment:
+      SENDGRID_DEV_API_KEY: SG.XXX.XX-XXX-XX
+      SENDGRID_DEV_SMTP_SERVER: inbucket:2500
+      SENDGRID_DEV_SMTP_USERNAME: ""
+      SENDGRID_DEV_SMTP_PASSWORD: ""
+    healthcheck:
+      disable: true
+
+  inbucket:
+    image: inbucket/inbucket:stable
+    restart: unless-stopped
+    hostname: inbucket
+    volumes:
+      - ./volumes/inbucket/config:/config:Z
+      - ./volumes/inbucket/storage:/storage:Z
+    ports:
+      - "2500:2500" # SMTP
+      - "1100:1100" # POP3
+      - "9000:9000" # SMTP
